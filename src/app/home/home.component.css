@@ -1,34 +1,73 @@
 
 .content{
-    margin-top: 75px;
+    margin-top: 6rem;
 
 }
 .main-section{
     display: flex;
-    padding: 1rem;
+    padding: 1rem 3rem;
 }
 .code{
     /* display: flex;e */
     width: 60%;
 }
 .ip-op{
-    /* display: flex; */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     width: 40%;
 }
 select{
     /* display:block; */
+    font-size: 20px;
+    width: 6rem;
+    border-radius: 8px;
        
 
 }
 span{
     display: block;
+    margin-bottom: 1rem;
 }
-h4{
+h1{
     text-align: center;
+    color: #1724c9;
 }
 
 .source-code{
-     width: 80%;
+     width: 90%;
     margin-top: 1rem;
     height: 60vh;
+    font-size: 16px;
+    box-sizing: border-box;
+    padding: 10px;
+    border: 2px solid black;
+}
+
+.input-area{
+        width: 80%;
+    height: 10vh;
+    border: 2px solid black;
+    font-size: 16px;
+     box-sizing: border-box;
+    padding: 10px;
+}
+.output-area{
+    width: 80%;
+    height: 43vh;
+    border: 2px solid black;
+    font-size: 16px;
+     box-sizing: border-box;
+    padding: 10px;
+}
+
+label{
+    font-size: 20px;
+    font-weight: 600;
+    margin-right: 0.5rem;
+}
+
+span{
+    font-size: 20px;
+    font-weight: 600;
 }
