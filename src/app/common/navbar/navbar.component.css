@@ -26,6 +26,8 @@
   text-decoration: none;
 }
 
+
+
 .logo-img {
   height: 32px;
   margin-right: 12px;
@@ -34,7 +36,7 @@
 .logo-text {
   font-size: 2rem;
   font-weight: 600;
-  color: #222;
+  color: #0e09ab;
   white-space: nowrap;
 }
 

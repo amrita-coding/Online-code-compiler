@@ -4,23 +4,31 @@
         <div class="code">
             <div>
                 <label for="Language">Select Language</label>
-                <select name="Languages">
-                    <option value="C++">C++</option>
+                <select name="Languages" [(ngModel)]="langId">
+                    @for(lang of languages; track lang){
+                    <option value="{{lang['id']}}">{{lang['name']}}</option>
+                    }
+
                 </select>
             </div>
-            <textarea name="" class="source-code"></textarea>
+            <textarea name="code" class="source-code" [(ngModel)]="sourceCode"></textarea>
         </div>
         <div class="ip-op">
             <div class="ip-box">
                 <span>Input</span>
-                <textarea name="" class="input-area"></textarea>
+                <textarea name="input" class="input-area" [(ngModel)]="input"></textarea>
             </div>
             <div class="op-box">
                 <span>Output</span>
-                <textarea name="" class="output-area"></textarea>
+                <textarea name="output" class="output-area" [(ngModel)]="output"></textarea>
             </div>
 
         </div>
     </div>
+
+    <button type="button" class="run" (click)="onRun()" [disabled]="isLoading">
+        <span *ngIf="!isLoading" style="font-weight: unset; margin-bottom: unset;">Run</span>
+        <span *ngIf="isLoading" style="font-weight: unset; margin-bottom: unset;"  class="spinner"></span>
+    </button>
 
 </div>
