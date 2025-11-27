@@ -1,35 +1,98 @@
-<div class="content">
-    <h1>Online-Compiler</h1>
-    <div class="runtime-status">Runtime status: {{ runtimeStatus }}</div>
-    <div class="main-section">
-        <div class="code">
-            <div>
-                <label for="Language">Select Language</label>
-                <select name="Languages" [(ngModel)]="langId">
-                    @for(lang of languages; track lang){
-                    <option value="{{lang['id']}}">{{lang['name']}}</option>
-                    }
-
-                </select>
-            </div>
-            <textarea name="code" class="source-code" [(ngModel)]="sourceCode"></textarea>
-        </div>
-        <div class="ip-op">
-            <div class="ip-box">
-                <span>Input</span>
-                <textarea name="input" class="input-area" [(ngModel)]="input"></textarea>
-            </div>
-            <div class="op-box">
-                <span>Output</span>
-                <textarea name="output" class="output-area" [(ngModel)]="output"></textarea>
-            </div>
-
-        </div>
+<div class="app">
+  <!-- header -->
+  <div class="topbar">
+    <div class="logo-container">
+      <img src="assets/UI%20Design/logo.png" alt="Logo" class="logo-img" />
+      <div class="logo-text"><span class="logo-run">Run</span><span class="logo-x">X</span></div>
     </div>
 
-    <button type="button" class="run" (click)="onRun()" [disabled]="isLoading">
-        <span *ngIf="!isLoading" style="font-weight: unset; margin-bottom: unset;">Run</span>
-        <span *ngIf="isLoading" style="font-weight: unset; margin-bottom: unset;"  class="spinner"></span>
-    </button>
+    <div style="color:var(--muted)"> &nbsp;&nbsp; </div>
 
+    <div class="header-right">
+      <select [(ngModel)]="langId" class="language-select" title="Language selector">
+        <option *ngFor="let l of languages" [value]="l.id">{{l.name}}</option>
+      </select>
+
+      <div class="toggle-capsule" title="Theme toggle" (click)="toggleTheme()">
+        <span class="capsule-bg">
+          <span class="capsule-knob" [class.dark-mode]="isDark">
+            {{ isDark ? '☀' : '☾' }}
+          </span>
+        </span>
+        <span class="mode-label">{{ isDark ? 'Light' : 'Dark' }}</span>
+      </div>
+
+      <button class="execute" (click)="executeClicked()">Execute ▶</button>
+    </div>
+  </div>
+
+  <!-- main content -->
+  <div class="main">
+    <!-- left skinny toolbar -->
+    <div class="leftcol">
+      <button title="Files" class="icon-btn" [class.active-icon]="activeIcon === 'Files'" (click)="setActiveIcon('Files')">
+        <span class="active-line" *ngIf="activeIcon === 'Files'"></span>
+        <img src="assets/UI%20Design/document.svg" alt="Files" width="40" height="40" />
+      </button>
+      <button title="Explorer" class="icon-btn" [class.active-icon]="activeIcon === 'Explorer'" (click)="setActiveIcon('Explorer')">
+        <span class="active-line" *ngIf="activeIcon === 'Explorer'"></span>
+        <img src="assets/UI%20Design/folder.svg" alt="Explorer" width="40" height="40" />
+      </button>
+      <button title="Settings" class="icon-btn" [class.active-icon]="activeIcon === 'Settings'" (click)="setActiveIcon('Settings')">
+        <span class="active-line" *ngIf="activeIcon === 'Settings'"></span>
+        <img src="assets/UI%20Design/settings.svg" alt="Settings" width="40" height="40" />
+      </button>
+      <div style="flex:1"></div>
+      <button title="Logout" class="icon-btn" [class.active-icon]="activeIcon === 'Logout'" (click)="setActiveIcon('Logout')">
+        <span class="active-line" *ngIf="activeIcon === 'Logout'"></span>
+        <img src="assets/UI%20Design/logout.svg" alt="Logout" width="40" height="40" />
+      </button>
+    </div>
+
+    <!-- workspace: editor + right panel -->
+    <div class="workspace">
+      <!-- editor area -->
+      <div class="editor-wrap" role="region" aria-label="Editor area">
+        <div class="tabbar">
+          <div class="file-tab">main.py</div>
+          <div style="margin-left:auto;color:var(--muted);font-size:13px">Unsaved</div>
+        </div>
+
+        <div class="editor">
+          <div class="editor-container" #editorContainer aria-label="Code editor"></div>
+        </div>
+      </div>
+
+      <!-- right column -->
+      <div class="rightcol" role="complementary" aria-label="Execution Info">
+        <div class="panel-header">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:8px;height:30px;background:linear-gradient(180deg,var(--accent),#ff5a2d);border-radius:4px"></div>
+            <div style="font-weight:700">Execution Info</div>
+          </div>
+          <div class="controls">
+            <div class="small-btn" (click)="selectTab('Input')">Input</div>
+            <div class="small-btn tab" [class.active]="activeTab==='Output'" (click)="selectTab('Output')">Output</div>
+            <div class="small-btn" (click)="selectTab('Logs')">Console Logs</div>
+          </div>
+        </div>
+
+        <div style="font-size:13px;color:var(--muted);padding:6px 4px">{{activeTab}}</div>
+
+        <div class="console" id="console">
+          <div class="line" *ngFor="let ln of consoleLines" [ngClass]="ln.type">{{ln.text}}</div>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
+          <div style="color:var(--muted);font-size:13px">Last run: {{lastRunAgo}}</div>
+          <div style="display:flex;gap:8px">
+            <button class="small-btn" (click)="clearConsole()">Clear</button>
+            <button class="small-btn" (click)="downloadOutput()">Download</button>
+          </div>
+        </div>
+      </div>
+    </div> <!-- workspace -->
+  </div> <!-- main -->
 </div>
+
+<!-- Template-only; interactions handled in Angular component -->
