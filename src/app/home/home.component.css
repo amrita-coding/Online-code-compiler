@@ -1,3 +1,129 @@
+/* Language logo in dropdown */
+.language-select-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: relative;
+    height: 40px;
+}
+.lang-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #fff;
+    border: 1px solid #eee;
+    margin-right: -8px;
+    margin-left: 4px;
+    z-index: 2;
+    box-shadow: 0 0 0 2px #fff;
+}
+
+/* File tabs styles */
+.tabbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.file-tab {
+    background: linear-gradient(180deg, #2c3236, #262a2d);
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: #dfe6ea;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.file-tab.active-file {
+    background: linear-gradient(180deg, #ff7a2d, #ff5a2d);
+    color: #fff;
+}
+.file-ext {
+    margin-left: 2px;
+    font-size: 0.95em;
+    opacity: 0.7;
+}
+.add-file-btn {
+    background: #4e4d48;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 4px 12px;
+    font-size: 22px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: background 0.2s, transform 0.2s;
+}
+.add-file-btn:hover {
+    background: #ff7a2d;
+    transform: scale(1.1);
+}
+.close-file-btn {
+    background: transparent;
+    color: #fff;
+    border: none;
+    font-size: 18px;
+    margin-left: 6px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.2s, color 0.2s;
+}
+.file-tab.active-file .close-file-btn {
+    color: #fff;
+}
+.close-file-btn:hover {
+    background: #ff5a2d;
+    color: #fff;
+}
+/* Minimize button styles */
+
+/* Minimized terminal panel */
+.rightcol.minimized-terminal {
+    width: 60px !important;
+    min-width: 0 !important;
+    padding: 8px 4px !important;
+    overflow: hidden;
+    transition: width 0.3s, min-width 0.3s, padding 0.3s;
+}
+.rightcol.minimized-terminal .panel-header {
+    justify-content: center;
+}
+.rightcol.minimized-terminal .terminal-title-text,
+.rightcol.minimized-terminal .console,
+.rightcol.minimized-terminal .small-btn,
+.rightcol.minimized-terminal [style*="Last run"] {
+    display: none !important;
+}
+.rightcol.minimized-terminal .terminal-svg {
+    margin-right: 0;
+}
+/* Terminal title row styles */
+.terminal-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.terminal-svg {
+    transition: filter 0.2s, transform 0.2s;
+    vertical-align: middle;
+    cursor: pointer;
+    filter: grayscale(60%) brightness(0.7);
+}
+.terminal-title-row:hover .terminal-svg {
+    filter: none;
+    transform: scale(1.1);
+}
+.terminal-title-text {
+    font-size: 30px;
+    color: #4e4d48;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
 .active-icon {
     background: #f3f3f3 !important;
     position: relative;
@@ -192,6 +318,9 @@ body {
 }
 
 .language-select {
+        position: relative;
+        z-index: 1;
+        margin-left: 12px;
     background: var(--panel);
     color: #000;
     border-radius: 8px;
@@ -233,7 +362,6 @@ body {
 }
 
 .language-select option:checked {
-    background: #ff7a2d;
     color: #000;
 }
 
@@ -261,6 +389,83 @@ body {
 }
 
 /* Theme toggle styles */
+.terminal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+.terminal-btn {
+    background: #4e4d48;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+.terminal-btn:hover {
+    background: #ff7a2d;
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.execute {
+        background: linear-gradient(180deg, #ff8a3a, #ff6a1a);
+        padding: 20px 35px;
+        font-size: 24px;
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.2s;
+}
+.execute:hover {
+        background: linear-gradient(180deg, #ff7a2d, #ff5a2d);
+        transform: scale(1.05);
+}
+
+.language-select {
+        background: var(--panel);
+        color: #000;
+        border-radius: 8px;
+        padding: 18px 45px;
+        padding-right: 44px;
+        border: 2px solid #aaa;
+        cursor: pointer;
+        font-size: 18px;
+        font-weight: 400;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        min-width: 160px;
+        margin-left: -30px;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 20px;
+        padding-right: 44px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+}
+.language-select:hover,
+.language-select:focus {
+        border-color: #ff7a2d;
+        box-shadow: 0 0 8px rgba(255, 122, 45, 0.3);
+}
+
+.toggle-capsule {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: background 0.2s;
+}
+.toggle-capsule:hover {
+        background: #f3f3f3;
+}
 .toggle {
     background: var(--panel);
     border-radius: 8px;
@@ -415,7 +620,7 @@ body {
 /* right panel */
 .rightcol {
     width: 420px;
-    background: linear-gradient(180deg, #2b2f33, #24282c);
+    background: white;
     border-radius: 12px;
     padding: 12px;
     color: #e6e9eb;

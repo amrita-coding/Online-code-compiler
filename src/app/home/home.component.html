@@ -9,9 +9,12 @@
     <div style="color:var(--muted)"> &nbsp;&nbsp; </div>
 
     <div class="header-right">
-      <select [(ngModel)]="langId" class="language-select" title="Language selector">
-        <option *ngFor="let l of languages" [value]="l.id">{{l.name}}</option>
-      </select>
+      <div class="language-select-wrap">
+        <img *ngIf="selectedLangLogo" [src]="selectedLangLogo" alt="Lang Logo" class="lang-logo" />
+        <select [(ngModel)]="langId" class="language-select" title="Language selector" (change)="onLangChange()">
+          <option *ngFor="let l of languages" [value]="l.id">{{l.name}}</option>
+        </select>
+      </div>
 
       <div class="toggle-capsule" title="Theme toggle" (click)="toggleTheme()">
         <span class="capsule-bg">
@@ -54,7 +57,14 @@
       <!-- editor area -->
       <div class="editor-wrap" role="region" aria-label="Editor area">
         <div class="tabbar">
-          <div class="file-tab">main.py</div>
+          <ng-container *ngFor="let file of files; let i = index">
+            <div class="file-tab" [class.active-file]="i === selectedFileIndex">
+              {{file.name}}
+              <span class="file-ext">.{{file.ext}}</span>
+              <button class="close-file-btn" (click)="removeFile(i)">&times;</button>
+            </div>
+          </ng-container>
+          <button class="add-file-btn" (click)="addFile()">+</button>
           <div style="margin-left:auto;color:var(--muted);font-size:13px">Unsaved</div>
         </div>
 
@@ -64,31 +74,22 @@
       </div>
 
       <!-- right column -->
-      <div class="rightcol" role="complementary" aria-label="Execution Info">
+      <div class="rightcol" role="complementary" aria-label="Terminal" [class.minimized-terminal]="minimizedTerminal">
         <div class="panel-header">
-          <div style="display:flex;align-items:center;gap:10px">
+          <div class="terminal-title-row">
             <div style="width:8px;height:30px;background:linear-gradient(180deg,var(--accent),#ff5a2d);border-radius:4px"></div>
-            <div style="font-weight:700">Execution Info</div>
-          </div>
-          <div class="controls">
-            <div class="small-btn" (click)="selectTab('Input')">Input</div>
-            <div class="small-btn tab" [class.active]="activeTab==='Output'" (click)="selectTab('Output')">Output</div>
-            <div class="small-btn" (click)="selectTab('Logs')">Console Logs</div>
+            <img src="assets/UI Design/Terminal.svg" alt="Terminal" class="terminal-svg" width="32" height="32" (click)="toggleMinimizeTerminal()" [attr.aria-label]="minimizedTerminal ? 'Restore Terminal' : 'Minimize Terminal'" />
+            <div class="terminal-title-text">Terminal</div>
           </div>
         </div>
-
-        <div style="font-size:13px;color:var(--muted);padding:6px 4px">{{activeTab}}</div>
 
         <div class="console" id="console">
           <div class="line" *ngFor="let ln of consoleLines" [ngClass]="ln.type">{{ln.text}}</div>
         </div>
 
-        <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
-          <div style="color:var(--muted);font-size:13px">Last run: {{lastRunAgo}}</div>
-          <div style="display:flex;gap:8px">
-            <button class="small-btn" (click)="clearConsole()">Clear</button>
-            <button class="small-btn" (click)="downloadOutput()">Download</button>
-          </div>
+        <div class="terminal-actions">
+          <button class="terminal-btn" (click)="clearConsole()">Clear</button>
+          <button class="terminal-btn" (click)="downloadOutput()">Download</button>
         </div>
       </div>
     </div> <!-- workspace -->
