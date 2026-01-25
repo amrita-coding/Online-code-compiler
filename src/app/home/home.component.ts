@@ -17,6 +17,19 @@ export class HomeComponent implements OnInit {
   selectedFileIndex: number = 0;
   minimizedTerminal: boolean = false;
   activeIcon: string = 'Files';
+  isLoggedIn: boolean = false; // toggles between logout and user icon
+
+  // Auth modal state and form models
+  showAuthModal: boolean = false;
+  authMode: 'login' | 'signup' = 'login';
+  // login form
+  loginEmail: string = '';
+  loginPassword: string = '';
+  // signup form
+  signupName: string = '';
+  signupEmail: string = '';
+  signupPassword: string = '';
+  authError: string = '';
 
   constructor(private runner: RunnerService) { }
 
@@ -26,6 +39,75 @@ export class HomeComponent implements OnInit {
 
   setActiveIcon(name: string) {
     this.activeIcon = name;
+  }
+
+  logout() {
+    // perform logout actions (clear session/state as needed)
+    this.isLoggedIn = false;
+    localStorage.removeItem('user');
+    this.setActiveIcon('Files');
+    this.addConsoleLine('Logged out', 'warn');
+  }
+
+  // Open auth modal (login or signup)
+  openAuth(mode: 'login' | 'signup' = 'login') {
+    this.authMode = mode;
+    this.authError = '';
+    this.showAuthModal = true;
+  }
+
+  closeAuth() {
+    this.showAuthModal = false;
+    this.authError = '';
+    // clear form fields
+    this.loginEmail = this.loginPassword = '';
+    this.signupName = this.signupEmail = this.signupPassword = '';
+  }
+
+  submitLogin() {
+    // basic validation
+    this.authError = '';
+    if (!this.loginEmail || !this.loginEmail.includes('@')) {
+      this.authError = 'Please enter a valid email';
+      return;
+    }
+    if (!this.loginPassword || this.loginPassword.length < 4) {
+      this.authError = 'Password must be at least 4 characters';
+      return;
+    }
+    // fake auth success
+    const user = { email: this.loginEmail, name: this.loginEmail.split('@')[0] };
+    localStorage.setItem('user', JSON.stringify(user));
+    this.isLoggedIn = true;
+    this.addConsoleLine('Logged in as ' + user.email, 'ok');
+    this.closeAuth();
+  }
+
+  submitSignup() {
+    this.authError = '';
+    if (!this.signupName || this.signupName.length < 2) {
+      this.authError = 'Please enter your name';
+      return;
+    }
+    if (!this.signupEmail || !this.signupEmail.includes('@')) {
+      this.authError = 'Please enter a valid email';
+      return;
+    }
+    if (!this.signupPassword || this.signupPassword.length < 4) {
+      this.authError = 'Password must be at least 4 characters';
+      return;
+    }
+    const user = { email: this.signupEmail, name: this.signupName };
+    localStorage.setItem('user', JSON.stringify(user));
+    this.isLoggedIn = true;
+    this.addConsoleLine('Account created & logged in as ' + user.email, 'ok');
+    this.closeAuth();
+  }
+
+  continueAsGuest() {
+    this.isLoggedIn = false;
+    this.addConsoleLine('Continuing as guest', 'warn');
+    this.closeAuth();
   }
 
   @ViewChild('editorContainer', { static: true }) editorContainer!: ElementRef<HTMLDivElement>;
@@ -56,6 +138,13 @@ export class HomeComponent implements OnInit {
     });
     this.initFiles();
     this.updateLangLogo();
+
+    // Restore user session if present (do not auto-open auth modal)
+    const user = localStorage.getItem('user');
+    if (user) {
+      this.isLoggedIn = true;
+      this.addConsoleLine('Welcome back, ' + (JSON.parse(user).name || JSON.parse(user).email || 'user'), 'ok');
+    }
   }
 
   initFiles() {
@@ -85,7 +174,7 @@ export class HomeComponent implements OnInit {
 
   addFile() {
     const lang = this.languages.find((l: any) => l.id == this.langId);
-    const newName = 'file' + (this.files.length + 1);
+    const newName = 'Untitled' + (this.files.length + 1);
     this.files.push({ name: newName, ext: lang?.ext || 'py', content: '' });
     this.selectedFileIndex = this.files.length - 1;
     setTimeout(() => this.updateEditorLanguage(), 100);
@@ -168,6 +257,11 @@ export class HomeComponent implements OnInit {
   }
 
   async executeClicked() {
+    // If not authenticated, prompt login/signup
+    // if (!this.isLoggedIn) {
+    //   this.openAuth('login');
+    //   return;
+    // }
     this.addConsoleLine('▶ Execution started...', 'ok');
     // Get code from selected file
     const code = this.files[this.selectedFileIndex]?.content || '';
@@ -272,12 +366,42 @@ export class HomeComponent implements OnInit {
   }
 
   downloadOutput() {
-    const blob = new Blob([String(this.output || '')], { type: 'text/plain' });
+    // Get current program source (prefer editor, fall back to selected file or sourceCode)
+    const program = this.editor && this.editor.getValue ? this.editor.getValue() : (this.files[this.selectedFileIndex]?.content || this.sourceCode || '');
+    const fileBase = this.files[this.selectedFileIndex]?.name || 'program';
+    const fileExt = this.files[this.selectedFileIndex]?.ext || (this.languages.find((l: any) => l.id == this.langId)?.ext || 'txt');
+
+    // Build download text with headings and preserve original indentation of program
+    const contentParts = [
+      `Program: ${fileBase}.${fileExt}`,
+      '--------------------',
+      program,
+      '',
+      'Output:',
+      '--------------------',
+      String(this.output || '')
+    ];
+    const content = contentParts.join('\n');
+
+    const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'output.txt';
+    a.download = `${fileBase}.txt`;
     a.click();
     URL.revokeObjectURL(url);
   }
+
+  // Convenience getter for user display name
+  get userName() {
+    try {
+      const u = localStorage.getItem('user');
+      if (!u) return '';
+      const parsed = JSON.parse(u);
+      return parsed.name || parsed.email || '';
+    } catch (e) {
+      return '';
+    }
+  }
 }
+

@@ -26,6 +26,7 @@
       </div>
 
       <button class="execute" (click)="executeClicked()">Execute ▶</button>
+      <div *ngIf="isLoggedIn" class="user-pill">Hi, {{ userName }}</div>
     </div>
   </div>
 
@@ -46,10 +47,19 @@
         <img src="assets/UI%20Design/settings.svg" alt="Settings" width="40" height="40" />
       </button>
       <div style="flex:1"></div>
-      <button title="Logout" class="icon-btn" [class.active-icon]="activeIcon === 'Logout'" (click)="setActiveIcon('Logout')">
-        <span class="active-line" *ngIf="activeIcon === 'Logout'"></span>
-        <img src="assets/UI%20Design/logout.svg" alt="Logout" width="40" height="40" />
-      </button>
+      <!-- show logout when user is logged in, otherwise show user icon -->
+      <ng-container *ngIf="isLoggedIn; else showUser">
+        <button title="Logout" class="icon-btn" [class.active-icon]="activeIcon === 'Logout'" (click)="logout()">
+          <span class="active-line" *ngIf="activeIcon === 'Logout'"></span>
+          <img src="assets/UI%20Design/logout.svg" alt="Logout" width="40" height="40" />
+        </button>
+      </ng-container>
+      <ng-template #showUser>
+        <button title="Account" class="icon-btn" [class.active-icon]="activeIcon === 'Account'" (click)="openAuth('login')">
+          <span class="active-line" *ngIf="activeIcon === 'Account'"></span>
+          <img src="assets/UI%20Design/user.svg" alt="User" width="40" height="40" />
+        </button>
+      </ng-template>
     </div>
 
     <!-- workspace: editor + right panel -->
@@ -58,7 +68,7 @@
       <div class="editor-wrap" role="region" aria-label="Editor area">
         <div class="tabbar">
           <ng-container *ngFor="let file of files; let i = index">
-            <div class="file-tab" [class.active-file]="i === selectedFileIndex">
+            <div class="file-tab" [class.   le]="i === selectedFileIndex">
               {{file.name}}
               <span class="file-ext">.{{file.ext}}</span>
               <button class="close-file-btn" (click)="removeFile(i)">&times;</button>
@@ -94,6 +104,46 @@
       </div>
     </div> <!-- workspace -->
   </div> <!-- main -->
+</div>
+
+<div class="auth-modal-backdrop" *ngIf="showAuthModal">
+  <div class="auth-modal" role="dialog" aria-modal="true" aria-label="Authentication dialog">
+    <button class="auth-close" (click)="closeAuth()">&times;</button>
+
+    <div class="auth-left">
+      <h2>{{ authMode === 'login' ? 'Welcome back' : 'Create account' }}</h2>
+      <p class="muted">Sign in or create an account to save your projects and run trusted code.</p>
+
+      <div class="auth-tabs">
+        <button [class.active]="authMode==='login'" (click)="authMode='login'">Login</button>
+        <button [class.active]="authMode==='signup'" (click)="authMode='signup'">Sign up</button>
+      </div>
+
+      <form *ngIf="authMode==='login'" (ngSubmit)="submitLogin()" class="auth-form">
+        <input type="email" placeholder="Email" [(ngModel)]="loginEmail" name="loginEmail" required />
+        <input type="password" placeholder="Password" [(ngModel)]="loginPassword" name="loginPassword" required />
+        <div class="auth-error" *ngIf="authError">{{authError}}</div>
+        <button class="auth-submit" type="button" (click)="submitLogin()">Login</button>
+        <button class="auth-alt" type="button" (click)="openAuth('signup')">Create an account</button>
+      </form>
+
+      <form *ngIf="authMode==='signup'" (ngSubmit)="submitSignup()" class="auth-form">
+        <input type="text" placeholder="Full name" [(ngModel)]="signupName" name="signupName" required />
+        <input type="email" placeholder="Email" [(ngModel)]="signupEmail" name="signupEmail" required />
+        <input type="password" placeholder="Password" [(ngModel)]="signupPassword" name="signupPassword" required />
+        <div class="auth-error" *ngIf="authError">{{authError}}</div>
+        <button class="auth-submit" type="button" (click)="submitSignup()">Sign up</button>
+        <button class="auth-alt" type="button" (click)="openAuth('login')">Already have an account?</button>
+      </form>
+
+      <div class="auth-guest">or <a href="#" (click)="$event.preventDefault(); continueAsGuest()">continue as guest</a></div>
+    </div>
+
+    <div class="auth-right">
+      <img src="assets/UI%20Design/auth-illustration.svg" alt="Authentication illustration" />
+    </div>
+
+  </div>
 </div>
 
 <!-- Template-only; interactions handled in Angular component -->

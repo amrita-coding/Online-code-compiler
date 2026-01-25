@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-label="Authentication illustration">
+  <defs>
+    <linearGradient id="g1" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff8a3a"/>
+      <stop offset="1" stop-color="#ff5a2d"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0" x2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.85"/>
+    </linearGradient>
+  </defs>
+
+  <!-- soft rounded card background -->
+  <rect x="6" y="6" width="588" height="388" rx="28" fill="url(#g1)" />
+  <rect x="36" y="36" width="520" height="328" rx="18" fill="#ffffff" opacity="0.06" />
+
+  <!-- lock symbol -->
+  <g transform="translate(60,70)">
+    <rect x="0" y="90" width="160" height="120" rx="14" fill="url(#g2)" />
+    <path d="M80 0a36 36 0 0 0-36 36v24" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>
+    <rect x="60" y="140" width="40" height="18" rx="6" fill="#ff7a2d" />
+  </g>
+
+  <!-- user card -->
+  <g transform="translate(300,58)">
+    <circle cx="80" cy="56" r="44" fill="url(#g2)" opacity="0.96" />
+    <rect x="28" y="120" width="104" height="84" rx="12" fill="url(#g2)" opacity="0.96" />
+    <circle cx="126" cy="136" r="6" fill="#ff7a2d" />
+  </g>
+
+  <!-- small decorative dots -->
+  <circle cx="520" cy="60" r="10" fill="#ffffff" opacity="0.12" />
+  <circle cx="480" cy="140" r="6" fill="#ffffff" opacity="0.12" />
+
+</svg>
