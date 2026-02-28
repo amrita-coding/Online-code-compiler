@@ -128,12 +128,12 @@
       </form>
 
       <form *ngIf="authMode==='signup'" (ngSubmit)="submitSignup()" class="auth-form">
-        <input type="text" placeholder="Full name" [(ngModel)]="signupName" name="signupName" required />
-        <input type="email" placeholder="Email" [(ngModel)]="signupEmail" name="signupEmail" required />
-        <input type="password" placeholder="Password" [(ngModel)]="signupPassword" name="signupPassword" required />
+        <input type="text" placeholder="Full name" [(ngModel)]="signupName" name="signupName" required [disabled]="isAuthLoading" />
+        <input type="email" placeholder="Email" [(ngModel)]="signupEmail" name="signupEmail" required [disabled]="isAuthLoading" />
+        <input type="password" placeholder="Password" [(ngModel)]="signupPassword" name="signupPassword" required [disabled]="isAuthLoading" />
         <div class="auth-error" *ngIf="authError">{{authError}}</div>
-        <button class="auth-submit" type="button" (click)="submitSignup()">Sign up</button>
-        <button class="auth-alt" type="button" (click)="openAuth('login')">Already have an account?</button>
+        <button class="auth-submit" type="button" (click)="submitSignup()" [disabled]="isAuthLoading">{{ isAuthLoading ? 'Creating account...' : 'Sign up' }}</button>
+        <button class="auth-alt" type="button" (click)="openAuth('login')" [disabled]="isAuthLoading">Already have an account?</button>
       </form>
 
       <div class="auth-guest">or <a href="#" (click)="$event.preventDefault(); continueAsGuest()">continue as guest</a></div>

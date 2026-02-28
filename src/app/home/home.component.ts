@@ -1,5 +1,6 @@
 import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { RunnerService } from '../runner.service';
+import { AuthService } from '../auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -30,8 +31,9 @@ export class HomeComponent implements OnInit {
   signupEmail: string = '';
   signupPassword: string = '';
   authError: string = '';
+  isAuthLoading: boolean = false;
 
-  constructor(private runner: RunnerService) { }
+  constructor(private runner: RunnerService, private authService: AuthService) { }
 
   toggleMinimizeTerminal() {
     this.minimizedTerminal = !this.minimizedTerminal;
@@ -85,23 +87,44 @@ export class HomeComponent implements OnInit {
 
   submitSignup() {
     this.authError = '';
+    this.isAuthLoading = true;
+
     if (!this.signupName || this.signupName.length < 2) {
       this.authError = 'Please enter your name';
+      this.isAuthLoading = false;
       return;
     }
     if (!this.signupEmail || !this.signupEmail.includes('@')) {
       this.authError = 'Please enter a valid email';
+      this.isAuthLoading = false;
       return;
     }
-    if (!this.signupPassword || this.signupPassword.length < 4) {
-      this.authError = 'Password must be at least 4 characters';
+    if (!this.signupPassword || this.signupPassword.length < 6) {
+      this.authError = 'Password must be at least 6 characters';
+      this.isAuthLoading = false;
       return;
     }
-    const user = { email: this.signupEmail, name: this.signupName };
-    localStorage.setItem('user', JSON.stringify(user));
-    this.isLoggedIn = true;
-    this.addConsoleLine('Account created & logged in as ' + user.email, 'ok');
-    this.closeAuth();
+
+    // Call the API to register
+    this.authService.register({
+      username: this.signupName,
+      email: this.signupEmail,
+      password: this.signupPassword
+    }).subscribe({
+      next: (response) => {
+        const user = { email: response.email, name: response.username };
+        localStorage.setItem('user', JSON.stringify(user));
+        this.isLoggedIn = true;
+        this.addConsoleLine('Account created & logged in as ' + response.email, 'ok');
+        this.closeAuth();
+        this.isAuthLoading = false;
+      },
+      error: (error) => {
+        const errorMsg = error.error || 'Registration failed. Please try again.';
+        this.authError = errorMsg;
+        this.isAuthLoading = false;
+      }
+    });
   }
 
   continueAsGuest() {
@@ -143,7 +166,7 @@ export class HomeComponent implements OnInit {
     const user = localStorage.getItem('user');
     if (user) {
       this.isLoggedIn = true;
-      this.addConsoleLine('Welcome back, ' + (JSON.parse(user).name || JSON.parse(user).email || 'user'), 'ok');
+      this.addConsoleLine('Welcome back, ' + this.userName, 'ok');
     }
   }
 
