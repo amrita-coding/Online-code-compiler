@@ -3,6 +3,7 @@ import { RunnerService } from '../runner.service';
 import { AuthService } from '../auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 
 
 @Component({
@@ -33,7 +34,7 @@ export class HomeComponent implements OnInit {
   authError: string = '';
   isAuthLoading: boolean = false;
 
-  constructor(private runner: RunnerService, private authService: AuthService) { }
+  constructor(private runner: RunnerService, private authService: AuthService, private http: HttpClient) { }
 
   toggleMinimizeTerminal() {
     this.minimizedTerminal = !this.minimizedTerminal;
@@ -41,14 +42,74 @@ export class HomeComponent implements OnInit {
 
   setActiveIcon(name: string) {
     this.activeIcon = name;
+    if (name === 'Directory' && this.isLoggedIn) {
+      this.loadSavedCodes();
+    }
   }
 
   logout() {
-    // perform logout actions (clear session/state as needed)
-    this.isLoggedIn = false;
-    localStorage.removeItem('user');
-    this.setActiveIcon('Files');
-    this.addConsoleLine('Logged out', 'warn');
+    // Call backend logout so the token can be blacklisted.
+    // AuthService.logout will also clear client-side session/state and redirect.
+    this.authService.logout().subscribe({
+      next: () => {
+        this.isLoggedIn = false;
+        this.savedCodes = [];
+        this.setActiveIcon('Files');
+        this.addConsoleLine('Logged out', 'warn');
+      },
+      error: (err) => {
+        // If logout fails, we still clear the UI state.
+        this.isLoggedIn = false;
+        this.savedCodes = [];
+        this.setActiveIcon('Files');
+        this.addConsoleLine('Logged out (offline)', 'warn');
+        console.warn('Logout failed', err);
+      }
+    });
+  }
+
+  shareCode() {
+    const code = this.editor && this.editor.getValue ? this.editor.getValue() : (this.files[this.selectedFileIndex]?.content || '');
+    const language = this.languages.find((l: any) => l.id == this.langId)?.name || 'Python';
+
+    this.authService.saveCode(code, language).subscribe({
+      next: (response) => {
+        const shareUrl = `${window.location.origin}/?share=${response.id}`;
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          this.addConsoleLine('Share link copied to clipboard!', 'ok');
+        }).catch(() => {
+          this.addConsoleLine(`Share URL: ${shareUrl}`, 'ok');
+        });
+      },
+      error: (err) => {
+        this.addConsoleLine('Failed to share code', 'warn');
+        console.error('Share error', err);
+      }
+    });
+  }
+
+  loadSharedCode(id: string) {
+    this.http.get<{ code: string; language: string }>(`http://localhost:8080/api/code/${id}`).subscribe({
+      next: (response) => {
+        // Set the language
+        const lang = this.languages.find((l: any) => l.name.toLowerCase() === response.language.toLowerCase());
+        if (lang) {
+          this.langId = lang.id;
+          this.updateLangLogo();
+        }
+        // Set the code
+        this.files[this.selectedFileIndex].content = response.code;
+        if (this.editor) {
+          this.editor.setValue(response.code);
+          this.updateEditorLanguage();
+        }
+        this.addConsoleLine('Shared code loaded', 'ok');
+      },
+      error: (err) => {
+        this.addConsoleLine('Failed to load shared code', 'warn');
+        console.error('Load shared code error', err);
+      }
+    });
   }
 
   // Open auth modal (login or signup)
@@ -77,12 +138,28 @@ export class HomeComponent implements OnInit {
       this.authError = 'Password must be at least 4 characters';
       return;
     }
-    // fake auth success
-    const user = { email: this.loginEmail, name: this.loginEmail.split('@')[0] };
-    localStorage.setItem('user', JSON.stringify(user));
-    this.isLoggedIn = true;
-    this.addConsoleLine('Logged in as ' + user.email, 'ok');
-    this.closeAuth();
+    this.isAuthLoading = true;
+    this.authService.login({ email: this.loginEmail, password: this.loginPassword }).subscribe({
+      next: (resp) => {
+        const response = resp.body as any;
+        const token = resp.headers.get('Authorization');
+        if (token) {
+          localStorage.setItem('token', token);
+        }
+        const user = { email: response.email, name: response.username };
+        localStorage.setItem('user', JSON.stringify(user));
+        this.isLoggedIn = true;
+        this.addConsoleLine('Logged in as ' + response.email, 'ok');
+        this.loadSavedCodes();
+        this.closeAuth();
+        this.isAuthLoading = false;
+      },
+      error: (error) => {
+        const errorMsg = error && error.error ? error.error : 'Login failed. Please try again.';
+        this.authError = errorMsg;
+        this.isAuthLoading = false;
+      }
+    });
   }
 
   submitSignup() {
@@ -116,6 +193,7 @@ export class HomeComponent implements OnInit {
         localStorage.setItem('user', JSON.stringify(user));
         this.isLoggedIn = true;
         this.addConsoleLine('Account created & logged in as ' + response.email, 'ok');
+        this.loadSavedCodes();
         this.closeAuth();
         this.isAuthLoading = false;
       },
@@ -133,7 +211,7 @@ export class HomeComponent implements OnInit {
     this.closeAuth();
   }
 
-  @ViewChild('editorContainer', { static: true }) editorContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('editorContainer', { static: false }) editorContainer!: ElementRef<HTMLDivElement>;
   editor: any = null;
 
   isLoading = false;
@@ -151,6 +229,7 @@ export class HomeComponent implements OnInit {
   activeTab: string = 'Output';
   consoleLines: Array<{ text: string; type?: string }> = [];
   lastRunAgo: string = '12s ago';
+  savedCodes: any[] = [];
 
   ngOnInit(): void {
     // Subscribe to pyodide status to show runtime readiness in UI
@@ -162,11 +241,18 @@ export class HomeComponent implements OnInit {
     this.initFiles();
     this.updateLangLogo();
 
+    // Check for shared code in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const shareId = urlParams.get('share');
+    if (shareId) {
+      this.loadSharedCode(shareId);
+    }
+
     // Restore user session if present (do not auto-open auth modal)
-    const user = localStorage.getItem('user');
-    if (user) {
-      this.isLoggedIn = true;
+    this.isLoggedIn = this.authService.isLoggedIn() || !!localStorage.getItem('user');
+    if (this.isLoggedIn) {
       this.addConsoleLine('Welcome back, ' + this.userName, 'ok');
+      this.loadSavedCodes();
     }
   }
 
@@ -192,6 +278,7 @@ export class HomeComponent implements OnInit {
       const lang = this.languages.find((l: any) => l.id == this.langId);
       this.editor.setValue(this.files[this.selectedFileIndex]?.content || '');
       this.editor.updateOptions({ language: lang?.ext === 'py' ? 'python' : 'javascript' });
+      this.editor.focus();
     }
   }
 
@@ -215,10 +302,16 @@ export class HomeComponent implements OnInit {
 
   selectFile(idx: number) {
     this.selectedFileIndex = idx;
-    setTimeout(() => this.updateEditorLanguage(), 100);
+    setTimeout(() => {
+      this.updateEditorLanguage();
+    }, 100);
   }
   async ngAfterViewInit() {
     // dynamically import monaco to avoid build-time issues if not installed yet
+    if (!this.editorContainer) {
+      console.error('Editor container not found');
+      return;
+    }
     try {
       const monaco = await import('monaco-editor');
       const initial = this.files[this.selectedFileIndex]?.content || '';
@@ -235,6 +328,8 @@ export class HomeComponent implements OnInit {
       this.editor.onDidChangeModelContent(() => {
         this.files[this.selectedFileIndex].content = this.editor.getValue();
       });
+      // Focus the editor to show the cursor
+      this.editor.focus();
     } catch (err) {
       console.error('Monaco load failed', err);
     }
@@ -425,6 +520,47 @@ export class HomeComponent implements OnInit {
     } catch (e) {
       return '';
     }
+  }
+
+  loadSavedCodes() {
+    this.authService.getUserCodes().subscribe({
+      next: (codes) => {
+        this.savedCodes = codes;
+      },
+      error: (err) => {
+        console.error('Failed to load saved codes', err);
+      }
+    });
+  }
+
+  saveCurrentCode() {
+    const code = this.editor && this.editor.getValue ? this.editor.getValue() : (this.files[this.selectedFileIndex]?.content || '');
+    const language = this.languages.find((l: any) => l.id == this.langId)?.name || 'Python';
+    this.authService.saveCode(code, language).subscribe({
+      next: (response) => {
+        this.addConsoleLine('Code saved successfully', 'ok');
+        this.loadSavedCodes(); // Refresh the list
+      },
+      error: (err) => {
+        this.addConsoleLine('Failed to save code', 'warn');
+        console.error('Save error', err);
+      }
+    });
+  }
+
+  loadCode(snippet: any) {
+    // Load the code into the editor
+    this.files[this.selectedFileIndex].content = snippet.code;
+    // Set language if possible
+    const lang = this.languages.find((l: any) => l.name.toLowerCase() === snippet.language.toLowerCase());
+    if (lang) {
+      this.langId = lang.id;
+      this.updateLangLogo();
+      setTimeout(() => this.updateEditorLanguage(), 100);
+    }
+    // Switch back to editor
+    this.setActiveIcon('Files');
+    this.addConsoleLine('Code loaded from saved', 'ok');
   }
 }
 

@@ -26,6 +26,7 @@
       </div>
 
       <button class="execute" (click)="executeClicked()">Execute ▶</button>
+      <button class="share-btn" (click)="shareCode()" title="Share Code">Share</button>
       <div *ngIf="isLoggedIn" class="user-pill">Hi, {{ userName }}</div>
     </div>
   </div>
@@ -46,6 +47,10 @@
         <span class="active-line" *ngIf="activeIcon === 'Settings'"></span>
         <img src="assets/UI%20Design/settings.svg" alt="Settings" width="40" height="40" />
       </button>
+      <button title="Directory" class="icon-btn" [class.active-icon]="activeIcon === 'Directory'" (click)="setActiveIcon('Directory')">
+        <span class="active-line" *ngIf="activeIcon === 'Directory'"></span>
+        <img src="assets/UI%20Design/folder.svg" alt="Directory" width="40" height="40" />
+      </button>
       <div style="flex:1"></div>
       <!-- show logout when user is logged in, otherwise show user icon -->
       <ng-container *ngIf="isLoggedIn; else showUser">
@@ -65,10 +70,10 @@
     <!-- workspace: editor + right panel -->
     <div class="workspace">
       <!-- editor area -->
-      <div class="editor-wrap" role="region" aria-label="Editor area">
+      <div *ngIf="activeIcon !== 'Directory'" class="editor-wrap" role="region" aria-label="Editor area">
         <div class="tabbar">
           <ng-container *ngFor="let file of files; let i = index">
-            <div class="file-tab" [class.   le]="i === selectedFileIndex">
+            <div class="file-tab" [class.active]="i === selectedFileIndex">
               {{file.name}}
               <span class="file-ext">.{{file.ext}}</span>
               <button class="close-file-btn" (click)="removeFile(i)">&times;</button>
@@ -80,6 +85,24 @@
 
         <div class="editor">
           <div class="editor-container" #editorContainer aria-label="Code editor"></div>
+        </div>
+      </div>
+
+      <!-- directory area -->
+      <div *ngIf="activeIcon === 'Directory'" class="directory-wrap" role="region" aria-label="Saved Codes">
+        <div class="directory-header">
+          <h3>Your Saved Codes</h3>
+          <button class="save-btn" (click)="saveCurrentCode()" *ngIf="isLoggedIn">Save Current Code</button>
+        </div>
+        <div class="directory-list">
+          <div *ngFor="let snippet of savedCodes" class="code-item" (click)="loadCode(snippet)">
+            <div class="code-info">
+              <span class="code-lang">{{ snippet.language }}</span>
+              <span class="code-date">{{ snippet.createdAt | date:'short' }}</span>
+            </div>
+            <div class="code-preview">{{ snippet.code.substring(0, 100) }}...</div>
+          </div>
+          <div *ngIf="savedCodes.length === 0" class="no-codes">No saved codes yet. Save some code to see them here!</div>
         </div>
       </div>
 

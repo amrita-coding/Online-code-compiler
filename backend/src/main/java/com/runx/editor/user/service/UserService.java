@@ -4,6 +4,8 @@ import com.runx.editor.user.User;
 import com.runx.editor.user.UserRepository;
 import com.runx.editor.user.dto.RegistrationRequest;
 import com.runx.editor.user.dto.RegistrationResponse;
+import com.runx.editor.user.dto.LoginRequest;
+import com.runx.editor.user.dto.LoginResponse;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,5 +33,18 @@ public class UserService {
         User u = new User(req.getUsername(), req.getEmail(), hashed);
         User saved = userRepository.save(u);
         return new RegistrationResponse(saved.getId(), saved.getUsername(), saved.getEmail());
+    }
+
+    @Transactional(readOnly = true)
+    public LoginResponse authenticate(LoginRequest req) {
+        var byEmail = userRepository.findByEmail(req.getEmail());
+        if (byEmail.isEmpty()) {
+            throw new IllegalArgumentException("invalid_credentials");
+        }
+        User u = byEmail.get();
+        if (!passwordEncoder.matches(req.getPassword(), u.getPassword())) {
+            throw new IllegalArgumentException("invalid_credentials");
+        }
+        return new LoginResponse(u.getId(), u.getUsername(), u.getEmail());
     }
 }
