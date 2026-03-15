@@ -30,14 +30,29 @@ public class CodeController {
         }
     }
 
+    @PostMapping("/share")
+    public ResponseEntity<?> shareCode(@RequestBody SaveCodeRequest request, @RequestHeader("Authorization") String token) {
+        try {
+            String jwt = token.replace("Bearer ", "");
+            Long userId = Long.parseLong(jwtUtil.extractUserId(jwt));
+            TempCodeSnippet snippet = service.shareCode(request.getCode(), request.getLanguage(), userId);
+            return ResponseEntity.ok(new SaveCodeResponse(snippet.getId()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error sharing code");
+        }
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getCode(@PathVariable String id) {
         Optional<CodeSnippet> snippet = service.getCodeById(id);
         if (snippet.isPresent()) {
             return ResponseEntity.ok(new GetCodeResponse(snippet.get().getCode(), snippet.get().getLanguage()));
-        } else {
-            return ResponseEntity.notFound().build();
         }
+        Optional<TempCodeSnippet> tempSnippet = service.getTempCodeById(id);
+        if (tempSnippet.isPresent()) {
+            return ResponseEntity.ok(new GetCodeResponse(tempSnippet.get().getCode(), tempSnippet.get().getLanguage()));
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/user")
@@ -49,6 +64,22 @@ public class CodeController {
             return ResponseEntity.ok(snippets);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error retrieving codes");
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteCode(@PathVariable String id, @RequestHeader("Authorization") String token) {
+        try {
+            String jwt = token.replace("Bearer ", "");
+            Long userId = Long.parseLong(jwtUtil.extractUserId(jwt));
+            boolean deleted = service.deleteCode(id, userId);
+            if (deleted) {
+                return ResponseEntity.ok("Code deleted");
+            } else {
+                return ResponseEntity.status(403).body("Not authorized or code not found");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error deleting code");
         }
     }
 }

@@ -81,6 +81,7 @@
           </ng-container>
           <button class="add-file-btn" (click)="addFile()">+</button>
           <div style="margin-left:auto;color:var(--muted);font-size:13px">Unsaved</div>
+          <button class="save-btn" (click)="saveCurrentCode()" *ngIf="isLoggedIn" title="Save Code">Save</button>
         </div>
 
         <div class="editor">
@@ -92,13 +93,15 @@
       <div *ngIf="activeIcon === 'Directory'" class="directory-wrap" role="region" aria-label="Saved Codes">
         <div class="directory-header">
           <h3>Your Saved Codes</h3>
-          <button class="save-btn" (click)="saveCurrentCode()" *ngIf="isLoggedIn">Save Current Code</button>
         </div>
         <div class="directory-list">
           <div *ngFor="let snippet of savedCodes" class="code-item" (click)="loadCode(snippet)">
-            <div class="code-info">
-              <span class="code-lang">{{ snippet.language }}</span>
-              <span class="code-date">{{ snippet.createdAt | date:'short' }}</span>
+            <div class="code-header">
+              <div class="code-info">
+                <span class="code-lang">{{ snippet.language }}</span>
+                <span class="code-date">{{ snippet.createdAt | date:'short' }}</span>
+              </div>
+              <button class="delete-btn" (click)="deleteCode(snippet.id); $event.stopPropagation()" title="Delete Code">🗑️</button>
             </div>
             <div class="code-preview">{{ snippet.code.substring(0, 100) }}...</div>
           </div>

@@ -3,9 +3,10 @@ package com.runx.editor.code;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 
 import java.util.UUID;
 
@@ -31,5 +32,15 @@ public class S3Service {
                 .build();
         s3Client.putObject(putObjectRequest, RequestBody.fromBytes(content));
         return s3Client.utilities().getUrl(GetUrlRequest.builder().bucket(bucketName).key(key).build()).toString();
+    }
+
+    public void deleteCode(String s3Url) {
+        // Extract key from URL, e.g., https://bucket.s3.amazonaws.com/codes/userId/uuid.txt -> codes/userId/uuid.txt
+        String key = s3Url.substring(s3Url.indexOf("/codes/") + 1);
+        DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .build();
+        s3Client.deleteObject(deleteObjectRequest);
     }
 }

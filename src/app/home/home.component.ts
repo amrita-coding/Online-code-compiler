@@ -45,6 +45,25 @@ export class HomeComponent implements OnInit {
     if (name === 'Directory' && this.isLoggedIn) {
       this.loadSavedCodes();
     }
+
+    if (name === 'Directory' && this.editor) {
+      this.editor.dispose();
+      this.editor = null;
+    }
+
+    // When returning to the editor from the directory view, ensure the Monaco editor is visible/updated.
+    if (name === 'Files') {
+      setTimeout(async () => {
+        if (!this.editor) {
+          await this.initMonacoEditor();
+        } else {
+          // Ensure editor layout updates and focus is restored.
+          this.updateEditorLanguage();
+          this.editor.layout();
+          this.editor.focus();
+        }
+      }, 10);
+    }
   }
 
   logout() {
@@ -72,20 +91,27 @@ export class HomeComponent implements OnInit {
     const code = this.editor && this.editor.getValue ? this.editor.getValue() : (this.files[this.selectedFileIndex]?.content || '');
     const language = this.languages.find((l: any) => l.id == this.langId)?.name || 'Python';
 
-    this.authService.saveCode(code, language).subscribe({
-      next: (response) => {
-        const shareUrl = `${window.location.origin}/?share=${response.id}`;
-        navigator.clipboard.writeText(shareUrl).then(() => {
-          this.addConsoleLine('Share link copied to clipboard!', 'ok');
-        }).catch(() => {
-          this.addConsoleLine(`Share URL: ${shareUrl}`, 'ok');
-        });
-      },
-      error: (err) => {
-        this.addConsoleLine('Failed to share code', 'warn');
-        console.error('Share error', err);
-      }
-    });
+    const token = localStorage.getItem('token');
+    if (token) {
+      this.http.post<{ id: string }>('http://localhost:8080/api/code/share', { code, language }, {
+        headers: { Authorization: `Bearer ${token}` }
+      }).subscribe({
+        next: (response) => {
+          const shareUrl = `${window.location.origin}/?share=${response.id}`;
+          navigator.clipboard.writeText(shareUrl).then(() => {
+            this.addConsoleLine('Share link copied to clipboard!', 'ok');
+          }).catch(() => {
+            this.addConsoleLine(`Share URL: ${shareUrl}`, 'ok');
+          });
+        },
+        error: (err) => {
+          this.addConsoleLine('Failed to share code', 'warn');
+          console.error('Share error', err);
+        }
+      });
+    } else {
+      this.addConsoleLine('Please log in to share code', 'warn');
+    }
   }
 
   loadSharedCode(id: string) {
@@ -307,6 +333,12 @@ export class HomeComponent implements OnInit {
     }, 100);
   }
   async ngAfterViewInit() {
+    if (this.activeIcon === 'Files') {
+      await this.initMonacoEditor();
+    }
+  }
+
+  async initMonacoEditor() {
     // dynamically import monaco to avoid build-time issues if not installed yet
     if (!this.editorContainer) {
       console.error('Editor container not found');
@@ -561,6 +593,31 @@ export class HomeComponent implements OnInit {
     // Switch back to editor
     this.setActiveIcon('Files');
     this.addConsoleLine('Code loaded from saved', 'ok');
+  }
+
+  deleteCode(id: string) {
+    if (confirm('Are you sure you want to delete this code?')) {
+      const token = localStorage.getItem('token');
+      if (token) {
+        this.http.delete(`http://localhost:8080/api/code/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+          responseType: 'text'
+        }).subscribe({
+          next: (response: string) => {
+            if (response && response.trim().toLowerCase() === 'code deleted') {
+              this.savedCodes = this.savedCodes.filter(s => s.id !== id);
+              this.addConsoleLine('Code deleted successfully', 'ok');
+            } else {
+              this.addConsoleLine('Failed to delete code: ' + response, 'warn');
+            }
+          },
+          error: (err) => {
+            this.addConsoleLine('Failed to delete code', 'warn');
+            console.error('Delete error', err);
+          }
+        });
+      }
+    }
   }
 }
 
