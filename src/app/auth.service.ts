@@ -4,6 +4,7 @@ import { Observable, of } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { HttpResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { environment } from '../environments/environment';
 
 export interface RegistrationRequest {
   username: string;
@@ -32,7 +33,7 @@ export interface LoginResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/api/auth';
+  private apiUrl = `${environment.apiUrl}/api/auth`;
 
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -69,10 +70,10 @@ export class AuthService {
 
   saveCode(code: string, language: string): Observable<any> {
     const request = { code, language };
-    return this.http.post(`http://localhost:8080/api/code/save`, request);
+    return this.http.post(`${environment.apiUrl}/api/code/save`, request);
   }
 
   getUserCodes(): Observable<any[]> {
-    return this.http.get<any[]>(`http://localhost:8080/api/code/user`);
+    return this.http.get<any[]>(`${environment.apiUrl}/api/code/user`);
   }
 }

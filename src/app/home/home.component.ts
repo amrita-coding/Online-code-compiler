@@ -4,6 +4,7 @@ import { AuthService } from '../auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 
 @Component({
@@ -93,7 +94,7 @@ export class HomeComponent implements OnInit {
 
     const token = localStorage.getItem('token');
     if (token) {
-      this.http.post<{ id: string }>('http://localhost:8080/api/code/share', { code, language }, {
+      this.http.post<{ id: string }>(`${environment.apiUrl}/api/code/share`, { code, language }, {
         headers: { Authorization: `Bearer ${token}` }
       }).subscribe({
         next: (response) => {
@@ -115,7 +116,7 @@ export class HomeComponent implements OnInit {
   }
 
   loadSharedCode(id: string) {
-    this.http.get<{ code: string; language: string }>(`http://localhost:8080/api/code/${id}`).subscribe({
+    this.http.get<{ code: string; language: string }>(`${environment.apiUrl}/api/code/${id}`).subscribe({
       next: (response) => {
         // Set the language
         const lang = this.languages.find((l: any) => l.name.toLowerCase() === response.language.toLowerCase());
@@ -599,7 +600,7 @@ export class HomeComponent implements OnInit {
     if (confirm('Are you sure you want to delete this code?')) {
       const token = localStorage.getItem('token');
       if (token) {
-        this.http.delete(`http://localhost:8080/api/code/${id}`, {
+        this.http.delete(`${environment.apiUrl}/api/code/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
           responseType: 'text'
         }).subscribe({
