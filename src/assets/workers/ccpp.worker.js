@@ -94,7 +94,7 @@ class CCPPRuntime {
     for (const [funcName, func] of Object.entries(this.functions)) {
       const callRegex = new RegExp(`${funcName}\\s*\\(([^)]*)\\)`, 'g');
       result = result.replace(callRegex, (match, argsStr) => {
-        return this.exgoecuteFunction(funcName, argsStr);
+        return this.executeFunction(funcName, argsStr);
       });
     }
     

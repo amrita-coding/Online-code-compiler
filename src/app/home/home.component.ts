@@ -245,7 +245,9 @@ export class HomeComponent implements OnInit {
   runtimeStatus: string = 'idle';
   languages: any = [
     { id: 1, name: 'Python', logo: 'assets/UI Design/python.svg', ext: 'py' },
-    { id: 2, name: 'JavaScript', logo: 'assets/UI Design/JS.svg', ext: 'js' }
+    { id: 2, name: 'JavaScript', logo: 'assets/UI Design/JS.svg', ext: 'js' },
+    { id: 3, name: 'C', logo: 'assets/UI Design/c.svg', ext: 'c' },
+    { id: 4, name: 'C++', logo: 'assets/UI Design/cpp.svg', ext: 'cpp' }
   ];
   sourceCode: any
   input: any = null
