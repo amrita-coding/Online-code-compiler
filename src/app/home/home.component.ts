@@ -347,6 +347,20 @@ export class HomeComponent implements OnInit {
     }
     try {
       const monaco = await import('monaco-editor');
+      
+      // Configure Monaco's workers path for production
+      const basePath = '/assets/monaco';
+      (window as any).MonacoEnvironment = {
+        getWorkerUrl: function (workerId: string, label: string) {
+          return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
+            self.MonacoEnvironment = {
+              baseUrl: '${basePath}/'
+            };
+            importScripts('${basePath}/worker.js');
+          `)}`;
+        }
+      };
+      
       const initial = this.files[this.selectedFileIndex]?.content || '';
       const lang = this.languages.find((l: any) => l.id == this.langId);
       this.editor = monaco.editor.create(this.editorContainer.nativeElement, {
@@ -355,8 +369,10 @@ export class HomeComponent implements OnInit {
         theme: this.isDark ? 'vs-dark' : 'vs',
         automaticLayout: true,
         minimap: { enabled: false },
-        fontFamily: 'Fira Code, Menlo, monospace',
+        fontFamily: 'Fira Code, Consolas, Monaco, Courier New, monospace',
         fontSize: 23,
+        lineNumbersMinChars: 3,
+        renderLineHighlight: 'all',
       });
       this.editor.onDidChangeModelContent(() => {
         this.files[this.selectedFileIndex].content = this.editor.getValue();

@@ -1,1 +1,35 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* Monaco Editor global styles for proper rendering */
+.monaco-editor {
+  font-feature-settings: "liga" 1 !important;
+}
+
+.monaco-editor,
+.monaco-editor-background,
+.monaco-scrollable-element {
+  font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace !important;
+}
+
+/* Fix line numbers alignment */
+.monaco-editor .margin {
+  background-color: inherit;
+}
+
+.monaco-editor .line-numbers {
+  padding-right: 6px !important;
+}
+
+/* Ensure proper cursor visibility */
+.monaco-editor .cursor {
+  border-left: 2px solid #aeafad !important;
+}
+
+.vs-dark .monaco-editor .cursor {
+  border-left-color: #aeafad !important;
+}
+
+/* Fix content area alignment */
+.monaco-editor .view-lines {
+  padding-left: 0 !important;
+}

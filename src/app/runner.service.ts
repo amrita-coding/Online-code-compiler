@@ -7,6 +7,7 @@ import { Subject } from 'rxjs';
 export class RunnerService {
   pyWorker: Worker | null = null;
   jsWorker: Worker | null = null;
+  ccppWorker: Worker | null = null;
   // observable to know when pyodide runtime is ready or loading
   pyStatus$ = new Subject<{ status: 'idle'|'loading'|'ready'|'error', message?: string }>();
 
@@ -30,6 +31,12 @@ export class RunnerService {
     } catch (e) {
       this.jsWorker = null;
       console.warn('Could not create JS worker', e);
+    }
+    try {
+      this.ccppWorker = new Worker('/assets/workers/ccpp.worker.js');
+    } catch (e) {
+      this.ccppWorker = null;
+      console.warn('Could not create C/C++ worker', e);
     }
   }
 
@@ -72,6 +79,24 @@ export class RunnerService {
     });
   }
 
+  runCCPP(code: string, stdin = ''): Promise<{ stdout: string; stderr: string }>{
+    return new Promise((resolve) => {
+      if (!this.ccppWorker) {
+        resolve({ stdout: '', stderr: 'C/C++ runtime unavailable' });
+        return;
+      }
+      const onMessage = (ev: MessageEvent) => {
+        const msg = ev.data || {};
+        if (msg.type === 'result') {
+          this.ccppWorker!.removeEventListener('message', onMessage);
+          resolve({ stdout: msg.stdout || '', stderr: msg.stderr || '' });
+        }
+      };
+      this.ccppWorker.addEventListener('message', onMessage);
+      this.ccppWorker.postMessage({ type: 'run', code, stdin });
+    });
+  }
+
   runCode(languageName: string, code: string, stdin = ''): Promise<{ stdout: string; stderr: string }>{
     const lang = (languageName || '').toLowerCase();
     if (lang.includes('python')) {
@@ -79,6 +104,9 @@ export class RunnerService {
     }
     if (lang.includes('javascript') || lang.includes('js') || lang.includes('node')) {
       return this.runJavaScript(code, stdin);
+    }
+    if (lang.includes('c') || lang.includes('c++') || lang.includes('cpp')) {
+      return this.runCCPP(code, stdin);
     }
     return Promise.resolve({ stdout: '', stderr: `Language not supported on client: ${languageName}` });
   }
