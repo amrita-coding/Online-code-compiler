@@ -1,39 +1,23 @@
-<nav class="navbar">
+<nav class="navbar" [class.scrolled]="isScrolled">
   <div class="navbar-container">
-    <a href="#" class="navbar-logo">
-      <!-- <img src="htt" class="logo-img" "> -->
+    <a routerLink="/" class="navbar-logo">
+      <img src="assets/UI Design/logo.png" alt="RunX Logo" class="logo-img">
       <span class="logo-text">RunX</span>
     </a>
-    <div class="navbar-actions">
-      <button data-collapse-toggle="navbar-sticky" type="button" class="menu-toggle-btn" aria-controls="navbar-sticky" aria-expanded="false">
-        <span class="sr-only">Open main menu</span>
-        <svg class="menu-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
-        </svg>
-      </button>
-    </div>
-    <div class="navbar-links" id="navbar-sticky">
+
+    <div class="navbar-links">
       <ul class="navbar-list">
-        <li>
-          <a href="#" class="navbar-link active" aria-current="page">Home</a>
-        </li>
-        <li>
-          <a href="#" class="navbar-link">Compiler</a>
-        </li>
-        <li>
-          <a href="#" class="navbar-link">Languages</a>
-        </li>
-        <li>
-          <a href="#" class="navbar-link">About</a>
-        </li>
+        <li><a routerLink="/" class="navbar-link" [class.active]="router.url === '/'">Home</a></li>
+        <li><a routerLink="/home" class="navbar-link" [class.active]="router.url === '/home'">Compiler</a></li>
+        <li><a href="#" class="navbar-link">Languages</a></li>
+        <li><a href="#" class="navbar-link">About</a></li>
       </ul>
     </div>
-    <div *ngIf="!isLoggedIn()">
-      <button type="button" class="log-in">Log in</button>
-      <button type="button" class="log-in">Sign up</button>
-    </div>
-    <div *ngIf="isLoggedIn()">
-      <button type="button" class="log-in" (click)="logout()">Logout</button>
+
+    <div class="auth-buttons">
+      <button type="button" class="btn-login" *ngIf="!isLoggedIn()">Log in</button>
+      <button type="button" class="btn-signup" *ngIf="!isLoggedIn()">Sign up</button>
+      <button type="button" class="btn-logout" *ngIf="isLoggedIn()" (click)="logout()">Logout</button>
     </div>
   </div>
 </nav>

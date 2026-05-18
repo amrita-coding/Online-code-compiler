@@ -1,0 +1,160 @@
+<app-navbar></app-navbar>
+<div class="landing-container">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">
+          <span class="hero-title-main">Code Online</span>
+          <span class="hero-title-sub">Like a Pro</span>
+        </h1>
+        <p class="hero-subtitle">
+          Experience the future of coding with our powerful online compiler.
+          Write, run, and debug code in multiple languages instantly.
+        </p>
+        <div class="hero-stats">
+          <div class="stat">
+            <span class="stat-number">10+</span>
+            <span class="stat-label">Languages</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">100K+</span>
+            <span class="stat-label">Users</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">24/7</span>
+            <span class="stat-label">Available</span>
+          </div>
+        </div>
+        <div class="hero-buttons">
+          <button class="btn-primary" (click)="startCoding()">
+            <span>Start Coding</span>
+            <svg class="btn-icon" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+            </svg>
+          </button>
+          <button class="btn-secondary" (click)="scrollToFeatures()">
+            <span>Learn More</span>
+          </button>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="code-preview">
+          <div class="code-window">
+            <div class="window-header">
+              <div class="window-controls">
+                <span class="control red"></span>
+                <span class="control yellow"></span>
+                <span class="control green"></span>
+              </div>
+              <span class="window-title">main.py</span>
+            </div>
+            <div class="code-content">
+              <pre><code><span class="code-keyword">def</span> <span class="code-function">hello_world</span>():
+    <span class="code-keyword">print</span>(<span class="code-string">"Hello, World!"</span>)
+
+<span class="code-comment"># Run the function</span>
+<span class="code-function">hello_world</span>()</code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="floating-elements">
+          <div class="floating-icon icon-1">
+            <img src="assets/UI Design/python.svg" alt="Python">
+          </div>
+          <div class="floating-icon icon-2">
+            <img src="assets/UI Design/JS.svg" alt="JavaScript">
+          </div>
+          <div class="floating-icon icon-3">
+            <img src="assets/UI Design/cpp.svg" alt="C++">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-shape shape-1"></div>
+    <div class="hero-shape shape-2"></div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section" id="features">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Powerful Features</h2>
+        <p class="section-subtitle">Everything you need to code efficiently and effectively</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 2.25-4.5l.5 1.5 1 2.5 2.25 0 1-2.5-1-2.5-2.25-2.5L10 8.5 8.5 11l2.25 2.5z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          <h3>Multiple Languages</h3>
+          <p>Support for Python, JavaScript, C++, Java, and many more programming languages.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          <h3>Instant Execution</h3>
+          <p>Run your code instantly with real-time output and error highlighting.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg fill="currentColor" viewBox="0 0 20 20">
+              <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path>
+            </svg>
+          </div>
+          <h3>Collaborative Coding</h3>
+          <p>Share your code snippets and collaborate with developers worldwide.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          <h3>Cloud Storage</h3>
+          <p>Save your code securely in the cloud and access it from anywhere.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          <h3>Code Formatting</h3>
+          <p>Automatic code formatting and syntax highlighting for better readability.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          <h3>24/7 Support</h3>
+          <p>Get help anytime with our comprehensive documentation and support.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2>Ready to Start Your Coding Journey?</h2>
+        <p>Join thousands of developers who trust our platform for their coding needs.</p>
+        <button class="btn-primary-large" (click)="startCoding()">
+          <span>Get Started Free</span>
+          <svg class="btn-icon" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </section>
+</div>
