@@ -8,6 +8,7 @@ export class RunnerService {
   pyWorker: Worker | null = null;
   jsWorker: Worker | null = null;
   ccppWorker: Worker | null = null;
+  ccppOutput$ = new Subject<{ type: 'stdout' | 'stderr'; text: string }>();
   // observable to know when pyodide runtime is ready or loading
   pyStatus$ = new Subject<{ status: 'idle'|'loading'|'ready'|'error', message?: string }>();
 
@@ -33,7 +34,17 @@ export class RunnerService {
       console.warn('Could not create JS worker', e);
     }
     try {
-      this.ccppWorker = new Worker('/assets/workers/ccpp.worker.js');
+      this.ccppWorker = new Worker('/assets/workers/ccpp.worker.js', { type: 'module' });
+      if (this.ccppWorker) {
+        this.ccppWorker.addEventListener('message', (ev: MessageEvent) => {
+          const msg = ev.data || {};
+          if (msg.type === 'stdout') {
+            this.ccppOutput$.next({ type: 'stdout', text: msg.text });
+          } else if (msg.type === 'stderr') {
+            this.ccppOutput$.next({ type: 'stderr', text: msg.text });
+          }
+        });
+      }
     } catch (e) {
       this.ccppWorker = null;
       console.warn('Could not create C/C++ worker', e);

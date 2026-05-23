@@ -1,4 +1,5 @@
 import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { RunnerService } from '../runner.service';
 import { AuthService } from '../auth.service';
 import { CommonModule } from '@angular/common';
@@ -257,6 +258,9 @@ export class HomeComponent implements OnInit {
   lineNumbers: number[] = Array.from({length: 40}, (_, i) => i + 1);
   activeTab: string = 'Output';
   consoleLines: Array<{ text: string; type?: string }> = [];
+  currentCcppStreaming: boolean = false;
+  streamedOutput: boolean = false;
+  ccppOutputSub: Subscription | null = null;
   lastRunAgo: string = '12s ago';
   savedCodes: any[] = [];
 
@@ -276,6 +280,15 @@ export class HomeComponent implements OnInit {
     if (shareId) {
       this.loadSharedCode(shareId);
     }
+
+    // Subscribe to live C/C++ stdout/stderr events so terminal output appears immediately.
+    this.ccppOutputSub = this.runner.ccppOutput$.subscribe(evt => {
+      if (!this.currentCcppStreaming) {
+        return;
+      }
+      this.streamedOutput = true;
+      this.addConsoleLine(evt.text, evt.type === 'stderr' ? 'warn' : 'ok');
+    });
 
     // Restore user session if present (do not auto-open auth modal)
     this.isLoggedIn = this.authService.isLoggedIn() || !!localStorage.getItem('user');
@@ -388,6 +401,10 @@ export class HomeComponent implements OnInit {
 
   ngOnDestroy(): void {
     if (this.editor && this.editor.dispose) this.editor.dispose();
+    if (this.ccppOutputSub) {
+      this.ccppOutputSub.unsubscribe();
+      this.ccppOutputSub = null;
+    }
   }
   onRun() {
     this.isLoading = true;  
@@ -466,17 +483,27 @@ export class HomeComponent implements OnInit {
   }
 
   runTerminalCode(selectedLang: string, code: string) {
+    const isCcpp = ['c', 'c++', 'cpp'].includes(selectedLang.toLowerCase());
+    this.currentCcppStreaming = isCcpp;
+    this.streamedOutput = false;
     this.isLoading = true;
     this.output = null;
     this.runner.runCode(selectedLang, code, this.input || '')
       .then(res => {
         this.output = res.stdout && res.stdout.length ? res.stdout : res.stderr;
-        this.addConsoleLine(this.output, res.stdout ? 'ok' : 'warn');
+        if (!isCcpp || !this.streamedOutput) {
+          this.addConsoleLine(this.output, res.stdout ? 'ok' : 'warn');
+        } else {
+          this.addConsoleLine('Execution completed.', 'ok');
+        }
         this.isLoading = false;
       })
       .catch(err => {
         this.addConsoleLine(String(err), 'warn');
         this.isLoading = false;
+      })
+      .finally(() => {
+        this.currentCcppStreaming = false;
       });
   }
 
