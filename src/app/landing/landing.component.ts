@@ -1,27 +1,41 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { NavbarComponent } from '../common/navbar/navbar.component';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [CommonModule, NavbarComponent],
+  imports: [CommonModule],
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.css'
 })
-export class LandingComponent {
+export class LandingComponent implements OnInit {
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private route: ActivatedRoute) {}
+
+  ngOnInit() {
+    this.route.fragment.subscribe(fragment => {
+      if (fragment) {
+        this.scrollToSection(fragment);
+      }
+    });
+  }
 
   startCoding() {
     this.router.navigate(['/home']);
   }
 
   scrollToFeatures() {
-    const featuresSection = document.getElementById('features');
-    if (featuresSection) {
-      featuresSection.scrollIntoView({ behavior: 'smooth' });
+    this.scrollToSection('features');
+  }
+
+  scrollToSection(id: string) {
+    const section = document.getElementById(id);
+    if (section) {
+      const navbar = document.querySelector('.navbar');
+      const offset = navbar ? navbar.clientHeight + 20 : 20;
+      const top = section.getBoundingClientRect().top + window.pageYOffset - offset;
+      window.scrollTo({ top, behavior: 'smooth' });
     }
   }
 }

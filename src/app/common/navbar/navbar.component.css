@@ -192,31 +192,6 @@
 }
 
 
-.navbar-list {
-  display: flex;
-  flex-direction: row;
-  gap: 24px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.navbar-link {
-  display: block;
-  padding: 8px 12px;
-  color: #222;
-  text-decoration: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  transition: background 0.2s, color 0.2s;
-}
-
-.navbar-link:hover,
-.navbar-link.active {
-  background: #2563eb;
-  color: #fff;
-}
-
 /* Responsive styles */
 @media (max-width: 768px) {
   .navbar-container {

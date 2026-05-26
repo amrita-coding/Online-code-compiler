@@ -9,8 +9,8 @@
       <ul class="navbar-list">
         <li><a routerLink="/" class="navbar-link" [class.active]="router.url === '/'">Home</a></li>
         <li><a routerLink="/home" class="navbar-link" [class.active]="router.url === '/home'">Compiler</a></li>
-        <li><a href="#" class="navbar-link">Languages</a></li>
-        <li><a href="#" class="navbar-link">About</a></li>
+        <li><a routerLink="/" fragment="features" class="navbar-link">Features</a></li>
+        <li><a routerLink="/about" class="navbar-link" [class.active]="router.url === '/about'">About</a></li>
       </ul>
     </div>
 
