@@ -775,6 +775,96 @@ body {
     animation: slideDown 200ms ease-out;
 }
 @keyframes slideDown { from { opacity:0; transform: translateY(-20px) scale(0.98); } to { opacity:1; transform: translateY(0) scale(1); } }
+.share-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.7);
+    z-index: 10000;
+    padding: 24px;
+}
+.share-modal {
+    width: 560px;
+    max-width: 100%;
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 28px 28px 22px;
+    position: relative;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+    animation: slideDown 220ms ease-out;
+}
+.modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background: #f8fafc;
+    color: #334155;
+    font-size: 20px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+.modal-close:hover {
+    background: #e2e8f0;
+}
+.share-modal-header h2 {
+    margin: 0 0 8px;
+    font-size: 24px;
+    color: #0f172a;
+}
+.share-modal-header p {
+    margin: 0;
+    color: #475569;
+    font-size: 14px;
+}
+.share-link-box {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    margin: 22px 0 12px;
+}
+.share-link-box input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    background: #f8fafc;
+    color: #0f172a;
+    font-size: 14px;
+    font-family: 'Fira Code', Consolas, monospace;
+}
+.copy-link-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 0 20px;
+    min-width: 100px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: transform 0.2s, background 0.2s;
+}
+.copy-link-btn:hover {
+    background: #5a67d8;
+    transform: translateY(-1px);
+}
+.share-note {
+    color: #64748b;
+    font-size: 13px;
+    margin-bottom: 18px;
+}
+.share-actions {
+    display: flex;
+    justify-content: flex-end;
+}
 .auth-left { padding: 34px; width: 480px; max-width: 68%; }
 .auth-left h2 { margin: 0 0 6px 0; font-size: 28px; color: #1f2937; }
 .auth-left .muted { color: #64748b; margin: 0 0 18px 0; }

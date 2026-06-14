@@ -19,6 +19,13 @@ export class LandingComponent implements OnInit {
         this.scrollToSection(fragment);
       }
     });
+
+    this.route.queryParams.subscribe(params => {
+      const shareId = params['share'];
+      if (shareId) {
+        this.router.navigate(['/home'], { queryParams: { share: shareId } });
+      }
+    });
   }
 
   startCoding() {

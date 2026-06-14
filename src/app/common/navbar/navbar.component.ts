@@ -15,6 +15,14 @@ export class NavbarComponent {
 
   constructor(private authService: AuthService, public router: Router) {}
 
+  openLogin(): void {
+    this.router.navigate(['/home'], { queryParams: { auth: 'login' } });
+  }
+
+  openSignup(): void {
+    this.router.navigate(['/home'], { queryParams: { auth: 'signup' } });
+  }
+
   @HostListener('window:scroll', [])
   onWindowScroll() {
     this.isScrolled = window.pageYOffset > 50;
@@ -25,6 +33,13 @@ export class NavbarComponent {
   }
 
   logout(): void {
-    this.authService.logout();
+    this.authService.logout().subscribe({
+      next: () => {
+        // logout completed, user redirected by AuthService.clearSession()
+      },
+      error: () => {
+        // ensure session state is cleaned even if backend logout fails
+      }
+    });
   }
 }

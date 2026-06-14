@@ -19,7 +19,8 @@ export class AppComponent {
     this.router.events.pipe(
       filter((event): event is NavigationEnd => event instanceof NavigationEnd)
     ).subscribe(event => {
-      this.showNavbar = event.urlAfterRedirects !== '/home';
+      const path = event.urlAfterRedirects.split('?')[0];
+      this.showNavbar = path !== '/home';
     });
   }
 }

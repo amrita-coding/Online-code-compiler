@@ -145,6 +145,24 @@
   </div> <!-- main -->
 </div>
 
+<div class="share-modal-backdrop" *ngIf="showShareModal">
+  <div class="share-modal" role="dialog" aria-modal="true" aria-label="Share code link dialog">
+    <button class="modal-close" (click)="closeShareModal()">&times;</button>
+    <div class="share-modal-header">
+      <h2>Share Your Code</h2>
+      <p>Send this link to anyone and they can view your shared snippet.</p>
+    </div>
+    <div class="share-link-box">
+      <input type="text" [value]="shareUrl" readonly aria-label="Share link" />
+      <button type="button" class="copy-link-btn" (click)="copyShareLink()">Copy</button>
+    </div>
+    <div class="share-note">Link copied automatically if your browser supports it.</div>
+    <div class="share-actions">
+      <button class="terminal-btn" type="button" (click)="closeShareModal()">Close</button>
+    </div>
+  </div>
+</div>
+
 <div class="auth-modal-backdrop" *ngIf="showAuthModal">
   <div class="auth-modal" role="dialog" aria-modal="true" aria-label="Authentication dialog">
     <button class="auth-close" (click)="closeAuth()">&times;</button>

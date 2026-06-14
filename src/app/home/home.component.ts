@@ -5,6 +5,7 @@ import { AuthService } from '../auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 import { environment } from '../../environments/environment';
 
 
@@ -36,7 +37,11 @@ export class HomeComponent implements OnInit {
   authError: string = '';
   isAuthLoading: boolean = false;
 
-  constructor(private runner: RunnerService, private authService: AuthService, private http: HttpClient) { }
+  // Share link dialog
+  showShareModal: boolean = false;
+  shareUrl: string = '';
+
+  constructor(private runner: RunnerService, private authService: AuthService, private http: HttpClient, private route: ActivatedRoute) { }
 
   toggleMinimizeTerminal() {
     this.minimizedTerminal = !this.minimizedTerminal;
@@ -99,11 +104,12 @@ export class HomeComponent implements OnInit {
         headers: { Authorization: `Bearer ${token}` }
       }).subscribe({
         next: (response) => {
-          const shareUrl = `${window.location.origin}/?share=${response.id}`;
-          navigator.clipboard.writeText(shareUrl).then(() => {
+          this.shareUrl = `${window.location.origin}/home?share=${response.id}`;
+          this.showShareModal = true;
+          navigator.clipboard.writeText(this.shareUrl).then(() => {
             this.addConsoleLine('Share link copied to clipboard!', 'ok');
           }).catch(() => {
-            this.addConsoleLine(`Share URL: ${shareUrl}`, 'ok');
+            this.addConsoleLine('Share link is ready to copy.', 'ok');
           });
         },
         error: (err) => {
@@ -113,7 +119,23 @@ export class HomeComponent implements OnInit {
       });
     } else {
       this.addConsoleLine('Please log in to share code', 'warn');
+      this.openAuth('login');
     }
+  }
+
+  copyShareLink() {
+    if (!this.shareUrl) {
+      return;
+    }
+    navigator.clipboard.writeText(this.shareUrl).then(() => {
+      this.addConsoleLine('Share link copied to clipboard!', 'ok');
+    }).catch(() => {
+      this.addConsoleLine('Failed to copy share link', 'warn');
+    });
+  }
+
+  closeShareModal() {
+    this.showShareModal = false;
   }
 
   loadSharedCode(id: string) {
@@ -274,12 +296,18 @@ export class HomeComponent implements OnInit {
     this.initFiles();
     this.updateLangLogo();
 
-    // Check for shared code in URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const shareId = urlParams.get('share');
-    if (shareId) {
-      this.loadSharedCode(shareId);
-    }
+    // Handle direct auth navigation from the landing page or navbar links
+    this.route.queryParams.subscribe(params => {
+      const authMode = params['auth'];
+      if (authMode === 'login' || authMode === 'signup') {
+        this.openAuth(authMode);
+      }
+
+      const shareId = params['share'];
+      if (shareId) {
+        this.loadSharedCode(shareId);
+      }
+    });
 
     // Subscribe to live C/C++ stdout/stderr events so terminal output appears immediately.
     this.ccppOutputSub = this.runner.ccppOutput$.subscribe(evt => {

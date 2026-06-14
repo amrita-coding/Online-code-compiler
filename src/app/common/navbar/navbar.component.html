@@ -15,8 +15,8 @@
     </div>
 
     <div class="auth-buttons">
-      <button type="button" class="btn-login" *ngIf="!isLoggedIn()">Log in</button>
-      <button type="button" class="btn-signup" *ngIf="!isLoggedIn()">Sign up</button>
+      <button type="button" class="btn-login" *ngIf="!isLoggedIn()" (click)="openLogin()">Log in</button>
+      <button type="button" class="btn-signup" *ngIf="!isLoggedIn()" (click)="openSignup()">Sign up</button>
       <button type="button" class="btn-logout" *ngIf="isLoggedIn()" (click)="logout()">Logout</button>
     </div>
   </div>
